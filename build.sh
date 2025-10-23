@@ -67,15 +67,16 @@ ZIPNAME="HydrogenKernel-${DEVICE}-${DATE}.zip"
 echo -e "\nBuilding for device: $DEVICE\n"
 
 # Toolchain Setup
-TC_DIR="$HOME/toolchains/neutron-clang"
-CURRENT_DIR=$(pwd)
-if [ ! -d "$TC_DIR" ]; then
-    mkdir -p $TC_DIR
-    cd $TC_DIR
-    bash <(curl -s "https://raw.githubusercontent.com/Neutron-Toolchains/antman/main/antman") -S=11032023
-    cd $CURRENT_DIR
+CLANG_VERSION="clang-r547379"
+TC_DIR="$HOME/toolchains"
+if [ ! -d "$TC_DIR/$CLANG_VERSION" ]; then
+    echo -e "Toolchain not found, downloading AOSP clang...\n"
+    git clone --depth=1 --branch=android16-release https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 "$TC_DIR/.temp"
+    mv "$TC_DIR/.temp/$CLANG_VERSION" "$TC_DIR"
+    rm -rf "$TC_DIR/.temp"
+    echo -e "\nToolchain successfully downloaded and extracted!\n"
 fi
-export PATH="$TC_DIR/bin:$PATH"
+export PATH="$TC_DIR/$CLANG_VERSION/bin:$PATH"
 
 # If the -c flag is specified, perform a full clean
 if [ "$CLEAN_BUILD" = true ]; then
