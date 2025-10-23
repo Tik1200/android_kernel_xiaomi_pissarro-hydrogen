@@ -112,16 +112,16 @@ if make -j$(nproc --all) \
     echo -e "\nKernel compiled successfully! Packing into a zip archive...\n"
 
     # Cloning AnyKernel3
-    git clone -q --depth=1 https://github.com/rio004/AnyKernel3 AnyKernel3
+    git clone -q --depth=1 --branch=master https://github.com/pissarro-development/anykernel3 anykernel3
 
     # Copying the compiled images
-    cp out/arch/arm64/boot/Image.gz AnyKernel3
+    cp out/arch/arm64/boot/Image.gz anykernel3/
 
     # Creating the zip archive
-    (cd AnyKernel3 && zip -r9 "../$ZIPNAME" ./* -x '*.git*' README.md '*placeholder')
+    (cd anykernel3 && zip -r9 "../$ZIPNAME" ./* -x '*.git*' README.md '*placeholder')
 
     # Cleanup
-    rm -rf AnyKernel3
+    rm -rf anykernel3
 
     echo -e "\nCompleted in $((SECONDS / 60)) min(s) and $((SECONDS % 60)) sec(s)!"
     echo "Kernel installer zip: $ZIPNAME"
