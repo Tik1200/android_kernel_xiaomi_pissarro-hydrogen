@@ -1,21 +1,72 @@
 #!/bin/bash
 #
-# Compile script for Hydrogen kernel
-# Brought to you by rio004 
+# Hydrogen Kernel build script
+# Brought to you by z3rokwq @ pissarro-development
 #
 
-# Date/Time
+# Exit immediately if a command exits with a non-zero status.
+set -e
+
+# Function to display help message
+show_help() {
+    cat << EOF
+Usage: $0 [OPTIONS] [CODENAME]
+
+Build script for Hydrogen Kernel
+
+OPTIONS:
+    -h, --help      Show this help message and exit
+    -c, --clean     Perform a full clean build (removes out directory)
+
+ARGUMENTS:
+    CODENAME        Device codename (default: pissarro)
+
+EXAMPLES:
+    $0                      # Build for default deviceZ
+    $0 <codename>           # Build for specific device
+    $0 -c                   # Clean build for default device
+    $0 --clean <codename>   # Clean build for specific device
+
+EOF
+}
+
+# Initial Setup
 SECONDS=0
 DATE=$(date '+%Y%m%d-%H%M')
 
-# Device
-DEVICE="${1:-agate}"
+# Default device
+DEVICE="pissarro"
+CLEAN_BUILD=false
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        -c|--clean)
+            CLEAN_BUILD=true
+            shift
+            ;;
+        -*)
+            echo "Error: Unknown option: $1"
+            echo "Use -h or --help for usage information"
+            exit 1
+            ;;
+        *)
+            DEVICE="$1"
+            shift
+            ;;
+    esac
+done
+
 DEFCONFIG="${DEVICE}_defconfig"
 ZIPNAME="HydrogenKernel-${DEVICE}-${DATE}.zip"
 
-echo -e "Building for: $DEVICE\n"
+echo -e "\nBuilding for device: $DEVICE\n"
 
-# Ensure the toolchain is available
+# Toolchain Setup
 TC_DIR="$HOME/toolchains/neutron-clang"
 CURRENT_DIR=$(pwd)
 if [ ! -d "$TC_DIR" ]; then
@@ -26,39 +77,54 @@ if [ ! -d "$TC_DIR" ]; then
 fi
 export PATH="$TC_DIR/bin:$PATH"
 
-# Process options
-CLEAN_BUILD=false
-INCLUDE_KSU=false
-for arg in "$@"; do
-    case $arg in
-        -c) CLEAN_BUILD=true ;;
-        -ksu) INCLUDE_KSU=true
-             ZIPNAME="HydrogenKernel-KSU-${DEVICE}-${DATE}.zip"
-             ;;
-    esac
-done
+# If the -c flag is specified, perform a full clean
+if [ "$CLEAN_BUILD" = true ]; then
+    echo -e "Performing a full clean...\n"
+    rm -rf out
+fi
 
-[ "$CLEAN_BUILD" = true ] && rm -rf out
-[ "$INCLUDE_KSU" = true ] && echo "Save your stuff!!" && curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
+# Compilation Variables
+export ARCH=arm64
+export SUBARCH=arm64
 
-# Compilation process
-mkdir -p out
-make O=out ARCH=arm64 $DEFCONFIG
+# Apply defconfig
+echo -e "Preparing kernel configuration...\n"
 
-echo -e "\nStarting compilation...\n"
-if make -j$(nproc --all) O=out ARCH=arm64 CC="ccache clang" LLVM=1 LLVM_IAS=1 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- Image.gz; then
-    echo -e "\nKernel compiled successfully! Zipping up...\n"
+make O=out "../../arm64/configs/$DEFCONFIG"
+
+# Start the build for Image.gz
+echo -e "\nStarting kernel compilation...\n"
+
+if make -j$(nproc --all) \
+    O=out \
+    CC="ccache clang" \
+    AR=llvm-ar \
+    NM=llvm-nm \
+    LD=ld.lld \
+    STRIP=llvm-strip \
+    LLVM=1 \
+    LLVM_IAS=1 \
+    CROSS_COMPILE=aarch64-linux-gnu- \
+    CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
+    Image.gz; then
+
+    echo -e "\nKernel compiled successfully! Packing into a zip archive...\n"
+
+    # Cloning AnyKernel3
     git clone -q --depth=1 https://github.com/rio004/AnyKernel3 AnyKernel3
+
+    # Copying the compiled images
     cp out/arch/arm64/boot/Image.gz AnyKernel3
-    rm -rf *zip out/arch/arm64/boot
-    (cd AnyKernel3 && zip -r9 "../$ZIPNAME" * -x '*.git*' README.md *placeholder)
+
+    # Creating the zip archive
+    (cd AnyKernel3 && zip -r9 "../$ZIPNAME" ./* -x '*.git*' README.md '*placeholder')
+
+    # Cleanup
     rm -rf AnyKernel3
-    if [ "$INCLUDE_KSU" = true ]; then
-        git restore drivers/{Makefile,Kconfig}
-        rm -rf KernelSU drivers/kernelsu
-    fi
-    echo -e "\nCompleted in $((SECONDS / 60)) minute(s) and $((SECONDS % 60)) second(s)!"
-    echo "Zip: $ZIPNAME"
+
+    echo -e "\nCompleted in $((SECONDS / 60)) min(s) and $((SECONDS % 60)) sec(s)!"
+    echo "Kernel installer zip: $ZIPNAME"
 else
-    echo -e "\nCompilation failed!"
+    echo -e "\nBuild failed!"
+    exit 1
 fi
