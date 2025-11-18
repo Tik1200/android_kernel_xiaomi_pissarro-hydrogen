@@ -314,23 +314,23 @@ static struct ieee80211_channel mtk_5ghz_channels[] = {
 	CHAN5G(44, 0),
 	CHAN5G(48, 0),
 	/* UNII-2 */
-	CHAN5G(52, 0),
-	CHAN5G(56, 0),
-	CHAN5G(60, 0),
-	CHAN5G(64, 0),
+	CHAN5G(52, IEEE80211_CHAN_RADAR),
+	CHAN5G(56, IEEE80211_CHAN_RADAR),
+	CHAN5G(60, IEEE80211_CHAN_RADAR),
+	CHAN5G(64, IEEE80211_CHAN_RADAR),
 	/* UNII-2e */
-	CHAN5G(100, 0),
-	CHAN5G(104, 0),
-	CHAN5G(108, 0),
-	CHAN5G(112, 0),
-	CHAN5G(116, 0),
-	CHAN5G(120, 0),
-	CHAN5G(124, 0),
-	CHAN5G(128, 0),
-	CHAN5G(132, 0),
-	CHAN5G(136, 0),
-	CHAN5G(140, 0),
-	CHAN5G(144, 0),
+	CHAN5G(100, IEEE80211_CHAN_RADAR),
+	CHAN5G(104, IEEE80211_CHAN_RADAR),
+	CHAN5G(108, IEEE80211_CHAN_RADAR),
+	CHAN5G(112, IEEE80211_CHAN_RADAR),
+	CHAN5G(116, IEEE80211_CHAN_RADAR),
+	CHAN5G(120, IEEE80211_CHAN_RADAR),
+	CHAN5G(124, IEEE80211_CHAN_RADAR),
+	CHAN5G(128, IEEE80211_CHAN_RADAR),
+	CHAN5G(132, IEEE80211_CHAN_RADAR),
+	CHAN5G(136, IEEE80211_CHAN_RADAR),
+	CHAN5G(140, IEEE80211_CHAN_RADAR),
+	CHAN5G(144, IEEE80211_CHAN_RADAR),
 	/* UNII-3 */
 	CHAN5G(149, 0),
 	CHAN5G(153, 0),
@@ -1605,9 +1605,9 @@ static void glLoadNvram(struct GLUE_INFO *prGlueInfo,
 		/* load country code */
 		/* cast to wide characters */
 		prRegInfo->au2CountryCode[0] =
-			(uint16_t) 'U';
+			(uint16_t) prNvramSettings->aucCountryCode[0];
 		prRegInfo->au2CountryCode[1] =
-			(uint16_t) 'S';
+			(uint16_t) prNvramSettings->aucCountryCode[1];
 
 	prRegInfo->ucSupport5GBand =
 			prNvramSettings->ucSupport5GBand;
