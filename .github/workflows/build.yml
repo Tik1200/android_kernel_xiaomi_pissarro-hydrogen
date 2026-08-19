@@ -15,8 +15,10 @@ jobs:
       - name: Setup Build Environment
         run: |
           sudo apt update
-          sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip
-          git clone https://gitlab.com/c3474/clang-r563880c.git --depth=1 clang
+          sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip wget
+          mkdir -p clang
+          wget -q https://archive.org/download/clang-r563880c/clang-r563880c.tar.gz
+          tar -xzf clang-r563880c.tar.gz -C clang
           
       - name: Compile Kernel
         run: |
