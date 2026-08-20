@@ -18,25 +18,22 @@ jobs:
           sudo apt update
           sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip wget curl gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
 
-          mkdir -p aosp-clang
-          curl -Lo clang.tar.gz "https://github.com/ZyCromerZ/Clang/releases/download/14.0.6-20250704-release/Clang-14.0.6-20250704.tar.gz"
-          tar -xzf clang.tar.gz -C aosp-clang
-          rm clang.tar.gz
+          # Վերցնում ենք հենց այն նույն Proton Clang-ը, որով աշխատում է քո կերնելը
+          git clone --depth=1 https://github.com/trinket-devs/proton-clang clang-r563880c
 
       - name: Compile Kernel
         run: |
           export ARCH=arm64
           export SUBARCH=arm64
-
-          export PATH="$(pwd)/aosp-clang/bin:$PATH"
-
-          export CC=clang
-          export CLANG_TRIPLE=aarch64-linux-gnu-
+          CLANG_BIN="$(pwd)/clang-r563880c/bin"
+          export PATH="$PATH:$CLANG_BIN"
+          export CC="$CLANG_BIN/clang"
           export CROSS_COMPILE=aarch64-linux-gnu-
           export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 
           make O=out pissarro_defconfig
-
+          
+          # Որպեսզի VDSO-ն չխանգարի, տեղում թարմացնում ենք կոնֆիգը
           ./scripts/config --file out/.config -d VDSO
           ./scripts/config --file out/.config -d COMPAT_VDSO
           make O=out olddefconfig
