@@ -9,13 +9,15 @@ jobs:
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          submodules: false
 
       - name: Setup Build Environment
         run: |
           sudo apt update
           sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
 
-          # Քաշում ենք Proton Clang-ը
           git clone --depth=1 https://github.com/trinket-devs/proton-clang clang-r563880c
 
       - name: Compile Kernel
@@ -30,7 +32,7 @@ jobs:
 
           make O=out pissarro_defconfig
           
-          # Անջատում ենք VDSO-ն .config ֆայլից, որ չտա այդ սխալը
+          # Անջատում ենք VDSO-ն, որ չխանգարի
           echo "CONFIG_VDSO is not set" >> out/.config
           echo "CONFIG_COMPAT_VDSO is not set" >> out/.config
 
