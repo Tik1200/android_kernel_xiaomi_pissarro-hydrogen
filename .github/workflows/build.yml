@@ -15,9 +15,8 @@ jobs:
           sudo apt update
           sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip
           
-          # AOSP-ի prebuilt Clang, կոնկրետ clang-r563880c snapshot-ը
-          git clone -b clang-r563880c --depth=1 \
-            https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 \
+          git clone --depth=1 \
+            https://github.com/trinket-devs/proton-clang \
             clang-r563880c
 
       - name: Compile Kernel
