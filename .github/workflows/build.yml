@@ -30,12 +30,10 @@ jobs:
           export CROSS_COMPILE=aarch64-linux-gnu-
           export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 
-          make O=out pissarro_defconfig
-          
-          # Անջատում ենք VDSO-ն, որ չխանգարի
-          echo "CONFIG_VDSO is not set" >> out/.config
-          echo "CONFIG_COMPAT_VDSO is not set" >> out/.config
+          # Հեռացնում ենք VDSO-ն, որ չկպնի նոր Clang-ին
+          rm -rf arch/arm64/kernel/vdso
 
+          make O=out pissarro_defconfig
           make -j$(nproc) O=out
 
       - name: Upload Kernel Artifact
