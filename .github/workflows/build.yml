@@ -18,10 +18,8 @@ jobs:
           sudo apt update
           sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip wget curl
 
-          # Скачиваем официальный и стабильный пребилт AOSP Clang (r450784d / Clang 14)
-          # Ճիշտ endpoint-ը +archive/ ա, voch te homepage-ի root
           mkdir -p aosp-clang
-          curl -Lo clang.tar.gz "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r450784d.tar.gz"
+          curl -Lo clang.tar.gz "https://github.com/ZyCromerZ/Clang/releases/download/14.0.6-20250704-release/Clang-14.0.6-20250704.tar.gz"
           tar -xzf clang.tar.gz -C aosp-clang
           rm clang.tar.gz
 
@@ -30,24 +28,19 @@ jobs:
           export ARCH=arm64
           export SUBARCH=arm64
 
-          # Добавляем наш рабочий Clang в PATH
           export PATH="$(pwd)/aosp-clang/bin:$PATH"
 
-          # Настройки компиляции для Xiaomi (pissarro)
           export CC=clang
           export CLANG_TRIPLE=aarch64-linux-gnu-
           export CROSS_COMPILE=aarch64-linux-gnu-
           export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 
-          # Конфигурация ядра
           make O=out pissarro_defconfig
 
-          # Отключаем VDSO, если в нем были ошибки
           ./scripts/config --file out/.config -d VDSO
           ./scripts/config --file out/.config -d COMPAT_VDSO
           make O=out olddefconfig
 
-          # Запуск сборки
           make -j$(nproc) O=out
 
       - name: Upload Kernel Artifact
