@@ -13,11 +13,10 @@ jobs:
       - name: Setup Build Environment
         run: |
           sudo apt update
-          sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip wget
+          sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip
           
-          # Скачиваем Clang из надежного зеркала LineageOS
-          mkdir -p clang-r563880c
-          wget -qO- https://lineageos.org | tar -xz -C clang-r563880c --strip-components=1
+          # Клонируем Clang r563880c напрямую из зеркала GitLab — это сработает без ошибок
+          git clone https://gitlab.com/Neebe3289/android_prebuilts_clang_host_linux-x86.git -b 14 --depth=1 clang-r563880c
 
       - name: Compile Kernel
         run: |
