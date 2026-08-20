@@ -16,7 +16,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip
-          git clone https://gitlab.com/c3474/clang-r563880c.git --depth=1 clang
+          git -c credential.helper= clone https://gitlab.com/c3474/clang-r563880c.git --depth=1 clang
           
       - name: Compile Kernel
         run: |
