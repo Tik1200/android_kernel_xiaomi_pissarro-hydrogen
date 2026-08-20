@@ -15,8 +15,8 @@ jobs:
           sudo apt update
           sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip
           
-          # Клонируем Clang r563880c напрямую из зеркала GitLab — это сработает без ошибок
-          git clone https://gitlab.com/Neebe3289/android_prebuilts_clang_host_linux-x86.git -b 14 --depth=1 clang-r563880c
+          # Скачиваем стабильный и проверенный Proton Clang для сборки ядер Android
+          git clone --depth=1 https://github.com clang-r563880c
 
       - name: Compile Kernel
         run: |
