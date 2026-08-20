@@ -15,8 +15,10 @@ jobs:
           sudo apt update
           sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip
           
-          # Скачиваем стабильный и проверенный Proton Clang для сборки ядер Android
-          git clone --depth=1 https://github.com clang-r563880c
+          # AOSP-ի prebuilt Clang, կոնկրետ clang-r563880c snapshot-ը
+          git clone -b clang-r563880c --depth=1 \
+            https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 \
+            clang-r563880c
 
       - name: Compile Kernel
         run: |
@@ -35,4 +37,3 @@ jobs:
         with:
           name: Hydrogen-Test-Kernel
           path: out/arch/arm64/boot/
-          
