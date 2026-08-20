@@ -16,32 +16,38 @@ jobs:
       - name: Setup Build Environment
         run: |
           sudo apt update
-          sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
-
+          sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip
+          
+          # Կլոնավորում ենք Proton Clang-ը
           git clone --depth=1 https://github.com/trinket-devs/proton-clang clang-r563880c
 
       - name: Compile Kernel
         run: |
           export ARCH=arm64
           export SUBARCH=arm64
-          CLANG_BIN="$(pwd)/clang-r563880c/bin"
-          export PATH="$PATH:$CLANG_BIN"
-          export CC="$CLANG_BIN/clang"
+          
+          # Ճիշտ ձևով ավելացնում ենք Clang-ը PATH-ի սկզբում (ոչ թե վերջում)
+          export PATH="$(pwd)/clang-r563880c/bin:$PATH"
+          
+          # Կոնֆիգուրացնում ենք հավաքման գործիքները
+          export CC=clang
           export CROSS_COMPILE=aarch64-linux-gnu-
           export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 
+          # Ստեղծում ենք out թղթապանակը և կատարում defconfig
           make O=out pissarro_defconfig
           
-          # Ճիշտ ձևով անջատում ենք VDSO-ն կոնֆիգից
+          # Անջատում ենք VDSO-ն, եթե այն խնդիրներ է առաջացնում
           ./scripts/config --file out/.config -d VDSO
           ./scripts/config --file out/.config -d COMPAT_VDSO
           make O=out olddefconfig
 
+          # Սկսում ենք կոմպիլյացիան
           make -j$(nproc) O=out
 
       - name: Upload Kernel Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Hydrogen-Test-Kernel
-          path: out/arch/arm64/boot/Image.gz-dtb
+          path: out/arch/arm64/boot/
           
