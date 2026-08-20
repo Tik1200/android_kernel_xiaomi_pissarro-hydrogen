@@ -16,13 +16,13 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip
-          git -c credential.helper= clone https://gitlab.com/c3474/clang-r563880c.git --depth=1 clang
+          git clone https://github.com/akhilnarang/aosp-clang clang-r563880c --depth=1
           
       - name: Compile Kernel
         run: |
           export ARCH=arm64
           export SUBARCH=arm64
-          export PATH="$(pwd)/clang/bin:$PATH"
+          export PATH="$(pwd)/clang-r563880c/bin:$PATH"
           export CC=clang
           export CROSS_COMPILE=aarch64-linux-gnu-
           export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
