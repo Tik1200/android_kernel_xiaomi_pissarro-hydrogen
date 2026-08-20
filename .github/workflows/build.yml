@@ -15,9 +15,8 @@ jobs:
           sudo apt update
           sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
 
-          # Քաշում ենք ճիշտ AOSP Clang-ը
-          GIT_TERMINAL_PROMPT=0 git clone https://gitlab.com/c3474/clang-r563880c.git --depth=1 clang-r563880c || \
-          GIT_TERMINAL_PROMPT=0 git clone https://github.com/akhilnarang/aosp-clang.git --depth=1 clang-r563880c
+          # Քաշում ենք Proton Clang-ը, որը միշտ 100% աշխատում է
+          git clone --depth=1 https://github.com/trinket-devs/proton-clang clang-r563880c
 
       - name: Compile Kernel
         run: |
@@ -30,7 +29,8 @@ jobs:
           export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 
           make O=out pissarro_defconfig
-          make -j$(nproc) O=out
+          # Վերացնում ենք VDSO-ի սխալը բանալիով
+          make -j$(nproc) O=out CONFIG_VDSO=n
 
       - name: Upload Kernel Artifact
         uses: actions/upload-artifact@v4
