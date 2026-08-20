@@ -15,7 +15,7 @@ jobs:
       - name: Setup Build Environment
         run: |
           sudo apt update
-          sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip clang lld llvm
+          sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip clang lld llvm gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
           
       - name: Compile Kernel
         run: |
