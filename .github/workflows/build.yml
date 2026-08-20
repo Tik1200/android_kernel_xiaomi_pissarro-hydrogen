@@ -13,11 +13,13 @@ jobs:
       - name: Setup Build Environment
         run: |
           sudo apt update
-          sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip wget
+          sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip wget curl
           
-          # Скачиваем стабильную прямую сборку Clang r563880c
-          mkdir clang-r563880c
-          wget -qO- https://googlesource.com | tar -xz -C clang-r563880c
+          # Создаем папку и скачиваем Clang через гарантированно рабочий релизный архив
+          mkdir -p clang-r563880c
+          curl -Lo clang.tar.gz "https://googlesource.com"
+          tar -xzf clang.tar.gz -C clang-r563880c
+          rm clang.tar.gz
 
       - name: Compile Kernel
         run: |
