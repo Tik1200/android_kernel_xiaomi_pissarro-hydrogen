@@ -13,13 +13,11 @@ jobs:
       - name: Setup Build Environment
         run: |
           sudo apt update
-          sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip wget curl
+          sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip wget
           
-          # Создаем папку и скачиваем Clang через гарантированно рабочий релизный архив
+          # Скачиваем Clang из надежного зеркала LineageOS
           mkdir -p clang-r563880c
-          curl -Lo clang.tar.gz "https://googlesource.com"
-          tar -xzf clang.tar.gz -C clang-r563880c
-          rm clang.tar.gz
+          wget -qO- https://lineageos.org | tar -xz -C clang-r563880c --strip-components=1
 
       - name: Compile Kernel
         run: |
