@@ -8,15 +8,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Code
-        uses: actions/checkout@v3
-        with:
-          ref: lineage-23.2
+        uses: actions/checkout@v4 # Обновлено до v4
 
       - name: Setup Build Environment
         run: |
           sudo apt update
           sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip
-          GIT_TERMINAL_PROMPT=0 git clone https://github.com/akhilnarang/aosp-clang.git --depth=1 clang-r563880c
+          # Скачиваем официальный Google Clang нужной версии напрямую, чтобы избежать проблем с Git
+          wget https://googlesource.com
+          mkdir clang-r563880c
+          tar -xf clang-r563880c.tar.gz -C clang-r563880c
           
       - name: Compile Kernel
         run: |
@@ -34,5 +35,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Hydrogen-Test-Kernel
-          path: out/arch/arm64/boot/Image.gz-dtb
+          path: out/arch/arm64/boot/
           
