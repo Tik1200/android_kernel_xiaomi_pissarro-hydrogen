@@ -8,17 +8,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Code
-        uses: actions/checkout@v4 # Обновлено до v4
+        uses: actions/checkout@v4
 
       - name: Setup Build Environment
         run: |
           sudo apt update
-          sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip
-          # Скачиваем официальный Google Clang нужной версии напрямую, чтобы избежать проблем с Git
-          wget https://googlesource.com
-          mkdir clang-r563880c
-          tar -xf clang-r563880c.tar.gz -C clang-r563880c
+          sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip wget
           
+          # Скачиваем стабильную прямую сборку Clang r563880c
+          mkdir clang-r563880c
+          wget -qO- https://googlesource.com | tar -xz -C clang-r563880c
+
       - name: Compile Kernel
         run: |
           export ARCH=arm64
