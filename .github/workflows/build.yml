@@ -16,7 +16,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip
-          git clone https://github.com/akhilnarang/aosp-clang clang-r563880c --depth=1
+          git -c credential.helper="" clone https://github.com/akhilnarang/aosp-clang --depth=1 clang-r563880c
           
       - name: Compile Kernel
         run: |
