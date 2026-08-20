@@ -16,7 +16,7 @@ jobs:
       - name: Setup Build Environment
         run: |
           sudo apt update
-          sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip wget curl
+          sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip wget curl gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
 
           mkdir -p aosp-clang
           curl -Lo clang.tar.gz "https://github.com/ZyCromerZ/Clang/releases/download/14.0.6-20250704-release/Clang-14.0.6-20250704.tar.gz"
@@ -47,4 +47,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Hydrogen-Test-Kernel
-          path: out/arch/arm64/boot/
+          path: out/arch/arm64/boot/Image.gz-dtb
+          
