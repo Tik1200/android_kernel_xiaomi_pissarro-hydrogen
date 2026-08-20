@@ -16,24 +16,24 @@ jobs:
       - name: Setup Build Environment
         run: |
           sudo apt update
-          sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip wget curl gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
+          sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip wget curl
 
-          # Քաշում ենք Proton Clang-ը
-          git clone --depth=1 https://github.com/trinket-devs/proton-clang clang-r563880c
+          mkdir -p aosp-clang
+          curl -Lo clang.tar.gz "https://github.com/ZyCromerZ/Clang/releases/download/14.0.6-20250704-release/Clang-14.0.6-20250704.tar.gz"
+          tar -xzf clang.tar.gz -C aosp-clang
+          rm clang.tar.gz
 
       - name: Compile Kernel
         run: |
           export ARCH=arm64
           export SUBARCH=arm64
-          CLANG_BIN="$(pwd)/clang-r563880c/bin"
-          export PATH="$PATH:$CLANG_BIN"
-          export CC="$CLANG_BIN/clang"
+
+          export PATH="$(pwd)/aosp-clang/bin:$PATH"
+
+          export CC=clang
+          export CLANG_TRIPLE=aarch64-linux-gnu-
           export CROSS_COMPILE=aarch64-linux-gnu-
           export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
-
-          # Ամբողջությամբ մաքրում ենք VDSO պանակը, որպեսզի build-ը չկպնի դրան
-          rm -rf arch/arm64/kernel/vdso/*
-          echo "obj-y := dummy.o" > arch/arm64/kernel/vdso/Makefile
 
           make O=out pissarro_defconfig
           make -j$(nproc) O=out
@@ -42,5 +42,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Hydrogen-Test-Kernel
-          path: out/arch/arm64/boot/Image.gz-dtb
-          
+          path: out/arch/arm64/boot/
