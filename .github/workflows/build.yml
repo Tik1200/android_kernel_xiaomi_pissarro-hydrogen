@@ -18,7 +18,7 @@ jobs:
           sudo apt update
           sudo apt install -y build-essential bc git bison flex libssl-dev libncurses5-dev libelf-dev zip wget curl gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
 
-          # Վերցնում ենք հենց այն նույն Proton Clang-ը, որով աշխատում է քո կերնելը
+          # Քաշում ենք Proton Clang-ը
           git clone --depth=1 https://github.com/trinket-devs/proton-clang clang-r563880c
 
       - name: Compile Kernel
@@ -31,13 +31,11 @@ jobs:
           export CROSS_COMPILE=aarch64-linux-gnu-
           export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 
-          make O=out pissarro_defconfig
-          
-          # Որպեսզի VDSO-ն չխանգարի, տեղում թարմացնում ենք կոնֆիգը
-          ./scripts/config --file out/.config -d VDSO
-          ./scripts/config --file out/.config -d COMPAT_VDSO
-          make O=out olddefconfig
+          # Ամբողջությամբ մաքրում ենք VDSO պանակը, որպեսզի build-ը չկպնի դրան
+          rm -rf arch/arm64/kernel/vdso/*
+          echo "obj-y := dummy.o" > arch/arm64/kernel/vdso/Makefile
 
+          make O=out pissarro_defconfig
           make -j$(nproc) O=out
 
       - name: Upload Kernel Artifact
